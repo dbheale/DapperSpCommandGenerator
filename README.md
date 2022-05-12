@@ -11,6 +11,7 @@ Required information:
 Configuration; This can be configured in 3 different ways.
   1) Command line arguments. Sample: ConnectionStrings:Main="connectionStringHere" TargetPath="C:\git\sample output\" Namespace="Sample.DAL"
   2) appsettings.json
+```
     {
       "ConnectionStrings": {
         "Main": ""
@@ -18,9 +19,18 @@ Configuration; This can be configured in 3 different ways.
       "TargetPath": "",
       "Namespace": "" 
     }
+```
   3) Durring execution you will be prompted if any of these values are not provided or are empty.
 
 
 Post code generation sample execution:
 
-var user = await dbConn.QueryAsync<User>(new GetUser_Command(userId));
+`var user = await dbConn.QueryAsync<User>(new GetUser_Command(userId));`
+
+If your stored procedure has OUT parameters, you can access them like so:
+
+```
+var canDownloadCommand = new Assert_UserCanDownload_Command(userId, fileId);
+await dbConn.ExecuteAsync(canDownloadCommand);  
+var canDownload = canDownloadCommand.CanDownload;
+```
