@@ -4,10 +4,6 @@
       "commandName": "WSL2",
       "environmentVariables": {},
       "distributionName": ""
-    },
-    "WithConn": {
-      "commandName": "Project",
-      "commandLineArgs": "ConnectionStrings:Main=\"Server=tcp:caddis-db-1.database.windows.net,1433;Initial Catalog=ITM_DB;Persist Security Info=False;User ID=caddisAdmin;Password=x1tFvILLCS9d;MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;\""
     }
   }
 }
