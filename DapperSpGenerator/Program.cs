@@ -1,4 +1,5 @@
-﻿using DapperSpGenerator;
+﻿using System.Diagnostics;
+using DapperSpGenerator;
 using Microsoft.Extensions.Configuration;
 
 IConfiguration config = new ConfigurationBuilder()
@@ -12,19 +13,19 @@ var desiredNamespace = config["Namespace"];
 
 if (!connectionString.HasContent())
 {
-    Console.Write("Connection String of database:");
+    Console.Write("Connection String of database: ");
     connectionString = Console.ReadLine();
 }
 
 if (!targetPath.HasContent())
 {
-    Console.Write("Target path for output files:");
+    Console.Write("Target path for output files: ");
     targetPath = Console.ReadLine();
 }
 
 if (!desiredNamespace.HasContent())
 {
-    Console.Write("Root namespace for output files:");
+    Console.Write("Root namespace for output files: ");
     desiredNamespace = Console.ReadLine();
 }
 
@@ -32,6 +33,9 @@ Argue.HasContent(connectionString);
 Argue.HasContent(targetPath);
 Argue.HasContent(desiredNamespace);
 
-var dapperCommandGen = new DapperCommandGeneration();
+var sw = new Stopwatch();
+sw.Start();
+await DapperCommandGeneration.GenerateDapperClasses(connectionString!, targetPath!, desiredNamespace!);
+sw.Stop();
 
-await dapperCommandGen.GenerateDapperClasses(connectionString!, targetPath!, desiredNamespace!);
+Console.WriteLine($"Commands generated in {sw.ElapsedMilliseconds}ms.");

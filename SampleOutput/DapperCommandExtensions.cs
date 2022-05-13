@@ -3,6 +3,9 @@ using System.Data;
 
 namespace SampleOutput
 {
+    /// <summary>
+    /// This class is automatically generated, to extend this class, please use a partial class.
+    /// </summary>
     public static partial class DapperCommandExtensions
     {
         public static async Task<IEnumerable<T>> QueryAsync<T>(this IDbConnection dbConnection, IDatabaseCommand command, IDbTransaction? transaction = null, int? commandTimeout = null)
@@ -10,7 +13,7 @@ namespace SampleOutput
             var parameters = command.GetParameters();
 
             var results = await dbConnection.QueryAsync<T>(
-                command.GetStoredProcedure()
+                command.GetSqlStatement()
                 , parameters
                 , transaction
                 , commandTimeout
@@ -29,7 +32,7 @@ namespace SampleOutput
             var parameters = command.GetParameters();
 
             var results = await dbConnection.QueryAsync(
-                command.GetStoredProcedure()
+                command.GetSqlStatement()
                 , parameters
                 , transaction
                 , commandTimeout
@@ -48,7 +51,7 @@ namespace SampleOutput
             var parameters = command.GetParameters();
 
             var results = await dbConnection.QueryFirstAsync<T>(
-                command.GetStoredProcedure()
+                command.GetSqlStatement()
                 , parameters
                 , transaction
                 , commandTimeout
@@ -67,7 +70,7 @@ namespace SampleOutput
             var parameters = command.GetParameters();
 
             var results = await dbConnection.QueryFirstOrDefaultAsync<T>(
-                command.GetStoredProcedure()
+                command.GetSqlStatement()
                 , parameters
                 , transaction
                 , commandTimeout
@@ -86,7 +89,7 @@ namespace SampleOutput
             var parameters = command.GetParameters();
 
             var results = await dbConnection.QuerySingleAsync<T>(
-                command.GetStoredProcedure()
+                command.GetSqlStatement()
                 , parameters
                 , transaction
                 , commandTimeout
@@ -105,7 +108,7 @@ namespace SampleOutput
             var parameters = command.GetParameters();
 
             var results = await dbConnection.QuerySingleOrDefaultAsync<T>(
-                command.GetStoredProcedure()
+                command.GetSqlStatement()
                 , parameters
                 , transaction
                 , commandTimeout
@@ -124,7 +127,7 @@ namespace SampleOutput
             var parameters = command.GetParameters();
 
             var results = await dbConnection.ExecuteAsync(
-                command.GetStoredProcedure()
+                command.GetSqlStatement()
                 , parameters
                 , transaction
                 , commandTimeout
@@ -143,7 +146,7 @@ namespace SampleOutput
             var parameters = command.GetParameters();
 
             var results = await dbConnection.ExecuteScalarAsync<T>(
-                command.GetStoredProcedure()
+                command.GetSqlStatement()
                 , parameters
                 , transaction
                 , commandTimeout

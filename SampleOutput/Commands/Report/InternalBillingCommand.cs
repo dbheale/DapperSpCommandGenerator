@@ -5,7 +5,7 @@
  *      / ___ \ |_| | | || |_| | | |_| | |___| |\  | |___|  _ </ ___ \| | | |___| |_| |
  *     /_/   \_\___/  |_| \___/   \____|_____|_| \_|_____|_| \_\/   \_\_| |_____|____/ 
  *    This file has been automatically generated. Any modification will get overwritten.
- * If you need to create a custom method, please create a partial class in the same namespace.
+ *       If you want to create custom commands, they must be in a different folder.
  */
 using Dapper;
 using System.Data;
@@ -25,7 +25,7 @@ namespace SampleOutput.Commands.Report
 
         public CommandType GetCommandType() => CommandType.StoredProcedure;
 
-        public string GetStoredProcedure() => "[Report].[InternalBilling]";
+        public string GetSqlStatement() => "[Report].[InternalBilling]";
 
         public bool HasOutParameters() => false;
 

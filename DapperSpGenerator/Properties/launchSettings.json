@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "DapperSpGenerator": {
+      "commandName": "Project",
+      "environmentVariables": {},
+      "distributionName": ""
+    }
+  }
+}

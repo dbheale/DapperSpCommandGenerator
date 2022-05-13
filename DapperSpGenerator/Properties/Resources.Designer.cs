@@ -66,15 +66,14 @@ namespace DapperSpGenerator.Properties {
         ///
         ///namespace |^NAMESPACE^|
         ///{
+        ///    /// &lt;summary&gt;
+        ///    /// This class is automatically generated, to extend this class, please use a partial class.
+        ///    /// &lt;/summary&gt;
         ///    public static partial class DapperCommandExtensions
         ///    {
         ///        public static async Task&lt;IEnumerable&lt;T&gt;&gt; QueryAsync&lt;T&gt;(this IDbConnection dbConnection, IDatabaseCommand command, IDbTransaction? transaction = null, int? commandTimeout = null)
         ///        {
-        ///            var parameters = command.GetParameters();
-        ///
-        ///            var results = await dbConnection.QueryAsync&lt;T&gt;(
-        ///                command.GetStoredProcedure()
-        ///                , par [rest of string was truncated]&quot;;.
+        ///            var parameters = command.GetParamete [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string DapperCommandExtensions {
             get {
@@ -88,11 +87,14 @@ namespace DapperSpGenerator.Properties {
         ///
         ///namespace |^NAMESPACE^|
         ///{
+        ///    /// &lt;summary&gt;
+        ///    /// This class is automatically generated.
+        ///    /// &lt;/summary&gt;
         ///    public interface IDatabaseCommand
         ///    {
         ///        DynamicParameters GetParameters();
         ///        CommandType GetCommandType();
-        ///        string GetStoredProcedure();
+        ///        string GetSqlStatement();
         ///        bool HasOutParameters();
         ///        void SetOutParameters(DynamicParameters parameters);
         ///    }
