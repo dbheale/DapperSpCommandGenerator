@@ -8,56 +8,24 @@ namespace DapperSpGenerator
 {
     public class DapperCommandGeneration
     {
-        // Query to get all stored procedures in every schema.
-        private const string Query = @"
-SELECT SCHEMA_NAME(pr.schema_id) AS [Schema]
-       , pr.name [Procedure]
-	   , pa.name AS [ParameterName]
-	   , type_name(user_type_id) AS [Type]
-	   , CAST(max_length AS VARCHAR(100)) AS [Length]  
-	   , CASE WHEN type_name(system_type_id) = 'uniqueidentifier' 
-	   			THEN CAST(precision AS int)
-	   			ELSE OdbcPrec(system_type_id, max_length, precision) 
-	     END AS [Precision]
-	   , OdbcScale(system_type_id, scale) AS [Scale]
-	   , is_nullable AS [IsNullable]
-	   , parameter_id AS [ParameterOrder]
-	   , CAST(pa.is_output AS BIT) AS [IsOutput]
-FROM   sys.procedures pr
-	LEFT JOIN sys.parameters pa 
-		ON OBJECT_NAME(pa.object_id) = pr.name
-			AND SCHEMA_NAME(pr.schema_id) = OBJECT_SCHEMA_NAME(pa.object_id)
-WHERE SCHEMA_NAME(pr.schema_id) <> 'cdc'
-ORDER BY [Schema], [Procedure], [ParameterOrder]";
-
-
         public static async Task GenerateDapperClasses(string connectionString, string rootPath, string desiredNamespace)
         {
             using IDbConnection connection = new SqlConnection(connectionString);
 
-            var extensions = Path.Combine(rootPath, "DapperCommandExtensions.cs");
-            if (File.Exists(extensions))
-            {
-                File.Delete(extensions);
-            }
-            await File.WriteAllTextAsync(extensions, Resources.DapperCommandExtensions.Replace("|^NAMESPACE^|", desiredNamespace));
-            
-            var contract = Path.Combine(rootPath, "IDatabaseCommand.cs");
-            if (File.Exists(contract))
-            {
-                File.Delete(contract);
-            }
-            await File.WriteAllTextAsync(contract, Resources.IDatabaseCommand.Replace("|^NAMESPACE^|", desiredNamespace));
+            await ReWriteDapperExtensions(rootPath, desiredNamespace);
 
-            var spDir = Path.Combine(rootPath, "Commands");
+            await ReWriteCommandInterface(rootPath, desiredNamespace);
+
+            var spDir = Path.Combine(rootPath, StaticStrings.StoredProcedureRelativeFolderPath);
 
             if (Directory.Exists(spDir))
             {
                 Directory.Delete(spDir, true);
             }
 
-            var storedProcedureDefinitions = await connection.QueryAsync<StoredProcedureDefinition>(Query);
+            var storedProcedureDefinitions = await connection.QueryAsync<StoredProcedureDefinition>(StaticStrings.Query);
 
+            // Group by schema, ignore the `temp` schema.
             var schemaRecordsGroup = storedProcedureDefinitions
                                      .GroupBy(g => g.Schema)
                                      .Where(w => !"temp".Equals(w.Key, StringComparison.OrdinalIgnoreCase));
@@ -67,30 +35,74 @@ ORDER BY [Schema], [Procedure], [ParameterOrder]";
                 BuildFiles(schemaRecords!, rootPath, desiredNamespace);
             }
         }
-        
+
+        private static async Task ReWriteCommandInterface(string rootPath, string desiredNamespace)
+        {
+            var contract = Path.Combine(rootPath, "IDatabaseCommand.cs");
+            if (File.Exists(contract))
+            {
+                File.Delete(contract);
+            }
+
+            await File.WriteAllTextAsync(contract, Resources.IDatabaseCommand.Replace("|^NAMESPACE^|", desiredNamespace));
+        }
+
+        private static async Task ReWriteDapperExtensions(string rootPath, string desiredNamespace)
+        {
+            var extensions = Path.Combine(rootPath, "DapperCommandExtensions.cs");
+            if (File.Exists(extensions))
+            {
+                File.Delete(extensions);
+            }
+
+            await File.WriteAllTextAsync(
+                extensions, Resources.DapperCommandExtensions.Replace("|^NAMESPACE^|", desiredNamespace)
+            );
+        }
+
         private static void BuildFiles(IGrouping<string, StoredProcedureDefinition> schemaRecords, string rootPath, string desiredNamespace)
         {
             var schema = schemaRecords.Key;
+
             var schemaProper = schema.ToUpperFirstCharacter();
-            
+
+            var schemaDirectory = Path.Combine(rootPath, StaticStrings.StoredProcedureRelativeFolderPath, $"{schemaProper}");
+
+            Directory.CreateDirectory(schemaDirectory);
+
             var storedProcedureGroups = schemaRecords
                 .GroupBy(k => k.Procedure, e => e);
 
             foreach (var storedProcedureGroup in storedProcedureGroups)
             {
-                
-                var sp = storedProcedureGroup.FirstOrDefault()?.Procedure?.Trim();
+                var storedProcedure = storedProcedureGroup.FirstOrDefault()?.Procedure?.Trim();
 
-                if (sp == null)
+                if (storedProcedure == null)
                 {
                     continue;
                 }
 
-                var spProper = sp.ToUpperFirstCharacter();
+                var spProper = storedProcedure.ToUpperFirstCharacter();
 
                 var parameters = GetDbParameters(storedProcedureGroup);
 
-                var commandClass = $@"/*
+                var commandClass = CreateCommandClass(desiredNamespace, schemaProper, spProper, parameters, schema, storedProcedure);
+
+                var filepath = Path.Combine(schemaDirectory, $"{spProper}_Command.cs");
+
+                if (File.Exists(filepath))
+                {
+                    File.Delete(filepath);
+                }
+
+                File.WriteAllText(filepath, commandClass, Encoding.UTF8);
+            }
+        }
+
+        private static string CreateCommandClass(string desiredNamespace, string schemaProper, string spProper, List<DbParameter> parameters,
+                                                 string schema, string sp)
+        {
+            return $@"/*
  *         _   _   _ _____ ___     ____ _____ _   _ _____ ____    _  _____ _____ ____  
  *        / \ | | | |_   _/ _ \   / ___| ____| \ | | ____|  _ \  / \|_   _| ____|  _ \ 
  *       / _ \| | | | | || | | | | |  _|  _| |  \| |  _| | |_) |/ _ \ | | |  _| | | | |
@@ -102,7 +114,7 @@ ORDER BY [Schema], [Procedure], [ParameterOrder]";
 using Dapper;
 using System.Data;
 
-namespace {desiredNamespace}.Commands.{schemaProper}
+namespace {desiredNamespace}.Commands.StoredProcedures.{schemaProper}
 {{
 
     public record struct {spProper}_Command({string.Join(", ", parameters.Select(s => s.Definition))}) : IDatabaseCommand
@@ -131,30 +143,6 @@ namespace {desiredNamespace}.Commands.{schemaProper}
         }}
     }}
 }}";
-
-                var directory = Path.Combine("Commands", $"{schemaProper}");
-
-                if (!Directory.Exists(Path.Combine(rootPath, directory)))
-                {
-                    Directory.CreateDirectory(Path.Combine(rootPath, directory));
-                }
-
-                var filepath = Path.Combine(directory, $"{spProper}Command.cs");
-
-                if (File.Exists(Path.Combine(rootPath, filepath)))
-                {
-                    File.Delete(Path.Combine(rootPath, filepath));
-                }
-
-                File.WriteAllText(Path.Combine(rootPath, filepath), commandClass, Encoding.UTF8);
-            }
-
-            const string spDir = "Commands";
-
-            if (!Directory.Exists(Path.Combine(rootPath, spDir)))
-            {
-                Directory.CreateDirectory(Path.Combine(rootPath, spDir));
-            }
         }
 
         private static List<DbParameter> GetDbParameters(IGrouping<string?, StoredProcedureDefinition> storedProcedureGroup)

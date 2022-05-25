@@ -13,19 +13,19 @@ var desiredNamespace = config["Namespace"];
 
 if (!connectionString.HasContent())
 {
-    Console.Write("Connection String of database: ");
+    Console.Write(StaticStrings.ConnectionStringMessage);
     connectionString = Console.ReadLine();
 }
 
 if (!targetPath.HasContent())
 {
-    Console.Write("Target path for output files: ");
+    Console.Write(StaticStrings.TargetPathMessage);
     targetPath = Console.ReadLine();
 }
 
 if (!desiredNamespace.HasContent())
 {
-    Console.Write("Root namespace for output files: ");
+    Console.Write(StaticStrings.NamespaceMessage);
     desiredNamespace = Console.ReadLine();
 }
 
@@ -38,4 +38,4 @@ sw.Start();
 await DapperCommandGeneration.GenerateDapperClasses(connectionString!, targetPath!, desiredNamespace!);
 sw.Stop();
 
-Console.WriteLine($"Commands generated in {sw.ElapsedMilliseconds}ms.");
+Console.WriteLine(StaticStrings.FinishMessage, sw.ElapsedMilliseconds);
