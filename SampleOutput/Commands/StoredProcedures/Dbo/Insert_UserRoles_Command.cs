@@ -10,10 +10,9 @@
 using Dapper;
 using System.Data;
 
-namespace SampleOutput.Commands.StoredProcedures.Dbo
+namespace SampleOutput.Commands.StoredProcedures.dbo
 {
-
-    public record struct Insert_UserRoles_Command(int UserId, int RoleId) : IDatabaseCommand
+    public record Insert_UserRoles_Command(int UserId, int RoleId) : IDatabaseCommand
     {
         public DynamicParameters GetParameters()
         {

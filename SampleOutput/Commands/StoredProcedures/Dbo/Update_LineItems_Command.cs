@@ -10,19 +10,20 @@
 using Dapper;
 using System.Data;
 
-namespace SampleOutput.Commands.StoredProcedures.Dbo
+namespace SampleOutput.Commands.StoredProcedures.dbo
 {
-
-    public record struct Update_LineItems_Command(int Id, int WorkOrderId, int WorkOrderTemplateSheetId, int LineItemGroupId, int SortOrder) : IDatabaseCommand
+    public record Update_LineItems_Command(int Id, int ReferenceId, int TemplateSheetId, int LineItemGroupId, int SortOrder, int ReferenceTypeId, int ParentId) : IDatabaseCommand
     {
         public DynamicParameters GetParameters()
         {
             var p = new DynamicParameters();
             p.Add("Id", Id);
-			p.Add("WorkOrderId", WorkOrderId);
-			p.Add("WorkOrderTemplateSheetId", WorkOrderTemplateSheetId);
+			p.Add("ReferenceId", ReferenceId);
+			p.Add("TemplateSheetId", TemplateSheetId);
 			p.Add("LineItemGroupId", LineItemGroupId);
 			p.Add("SortOrder", SortOrder);
+			p.Add("ReferenceTypeId", ReferenceTypeId);
+			p.Add("ParentId", ParentId);
             return p;
         }
 
@@ -39,7 +40,7 @@ namespace SampleOutput.Commands.StoredProcedures.Dbo
 
         public override string ToString()
         {
-            return $"Id:{Id}, WorkOrderId:{WorkOrderId}, WorkOrderTemplateSheetId:{WorkOrderTemplateSheetId}, LineItemGroupId:{LineItemGroupId}, SortOrder:{SortOrder}";
+            return $"Id:{Id}, ReferenceId:{ReferenceId}, TemplateSheetId:{TemplateSheetId}, LineItemGroupId:{LineItemGroupId}, SortOrder:{SortOrder}, ReferenceTypeId:{ReferenceTypeId}, ParentId:{ParentId}";
         }
     }
 }

@@ -10,10 +10,9 @@
 using Dapper;
 using System.Data;
 
-namespace SampleOutput.Commands.StoredProcedures.Dbo
+namespace SampleOutput.Commands.StoredProcedures.dbo
 {
-
-    public record struct Update_FieldHeaders_Command(int Id, string? Label, int Order) : IDatabaseCommand
+    public record Update_FieldHeaders_Command(int Id, string? Label, int Order) : IDatabaseCommand
     {
         public DynamicParameters GetParameters()
         {

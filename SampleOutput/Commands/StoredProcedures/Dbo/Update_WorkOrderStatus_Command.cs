@@ -10,10 +10,9 @@
 using Dapper;
 using System.Data;
 
-namespace SampleOutput.Commands.StoredProcedures.Dbo
+namespace SampleOutput.Commands.StoredProcedures.dbo
 {
-
-    public record struct Update_WorkOrderStatus_Command(int Id, string? Label, string? Description) : IDatabaseCommand
+    public record Update_WorkOrderStatus_Command(int Id, string? Label, string? Description) : IDatabaseCommand
     {
         public DynamicParameters GetParameters()
         {

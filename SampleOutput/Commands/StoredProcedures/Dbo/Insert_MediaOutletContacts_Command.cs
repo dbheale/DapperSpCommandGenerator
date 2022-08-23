@@ -10,10 +10,9 @@
 using Dapper;
 using System.Data;
 
-namespace SampleOutput.Commands.StoredProcedures.Dbo
+namespace SampleOutput.Commands.StoredProcedures.dbo
 {
-
-    public record struct Insert_MediaOutletContacts_Command(int MediaOutletId, int ContactId, int MediaOutletContactTypeId) : IDatabaseCommand
+    public record Insert_MediaOutletContacts_Command(int MediaOutletId, int ContactId, int MediaOutletContactTypeId) : IDatabaseCommand
     {
         public DynamicParameters GetParameters()
         {

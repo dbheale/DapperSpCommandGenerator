@@ -10,18 +10,17 @@
 using Dapper;
 using System.Data;
 
-namespace SampleOutput.Commands.StoredProcedures.Dbo
+namespace SampleOutput.Commands.StoredProcedures.dbo
 {
-
-    public record struct Update_WorkOrderTemplateFields_Command(int Id, int WorkOrderTemplateId, int FieldId, int WorkOrderTemplateSheetId, int SortOrder, string? LabelOverride, bool? UserInterfaceField, bool? OutputField, bool? GroupedBy, int HeaderStyleIndex, int RowStyleIndex, int CellStyleIndex, double? ColumnWidth, bool? Totals) : IDatabaseCommand
+    public record Update_WorkOrderTemplateFields_Command(int Id, int TemplateId, int FieldId, int TemplateSheetId, int SortOrder, string? LabelOverride, bool? UserInterfaceField, bool? OutputField, bool? GroupedBy, int HeaderStyleIndex, int RowStyleIndex, int CellStyleIndex, double? ColumnWidth, bool? Totals) : IDatabaseCommand
     {
         public DynamicParameters GetParameters()
         {
             var p = new DynamicParameters();
             p.Add("Id", Id);
-			p.Add("WorkOrderTemplateId", WorkOrderTemplateId);
+			p.Add("TemplateId", TemplateId);
 			p.Add("FieldId", FieldId);
-			p.Add("WorkOrderTemplateSheetId", WorkOrderTemplateSheetId);
+			p.Add("TemplateSheetId", TemplateSheetId);
 			p.Add("SortOrder", SortOrder);
 			p.Add("LabelOverride", LabelOverride);
 			p.Add("UserInterfaceField", UserInterfaceField);
@@ -48,7 +47,7 @@ namespace SampleOutput.Commands.StoredProcedures.Dbo
 
         public override string ToString()
         {
-            return $"Id:{Id}, WorkOrderTemplateId:{WorkOrderTemplateId}, FieldId:{FieldId}, WorkOrderTemplateSheetId:{WorkOrderTemplateSheetId}, SortOrder:{SortOrder}, LabelOverride:{LabelOverride}, UserInterfaceField:{UserInterfaceField}, OutputField:{OutputField}, GroupedBy:{GroupedBy}, HeaderStyleIndex:{HeaderStyleIndex}, RowStyleIndex:{RowStyleIndex}, CellStyleIndex:{CellStyleIndex}, ColumnWidth:{ColumnWidth}, Totals:{Totals}";
+            return $"Id:{Id}, TemplateId:{TemplateId}, FieldId:{FieldId}, TemplateSheetId:{TemplateSheetId}, SortOrder:{SortOrder}, LabelOverride:{LabelOverride}, UserInterfaceField:{UserInterfaceField}, OutputField:{OutputField}, GroupedBy:{GroupedBy}, HeaderStyleIndex:{HeaderStyleIndex}, RowStyleIndex:{RowStyleIndex}, CellStyleIndex:{CellStyleIndex}, ColumnWidth:{ColumnWidth}, Totals:{Totals}";
         }
     }
 }

@@ -10,10 +10,9 @@
 using Dapper;
 using System.Data;
 
-namespace SampleOutput.Commands.StoredProcedures.Dbo
+namespace SampleOutput.Commands.StoredProcedures.dbo
 {
-
-    public record struct Upsert_LineItemFieldValues_Command(int LineItemId, int FieldId, string? Value) : IDatabaseCommand
+    public record Upsert_LineItemFieldValues_Command(int LineItemId, int FieldId, string? Value) : IDatabaseCommand
     {
         public DynamicParameters GetParameters()
         {

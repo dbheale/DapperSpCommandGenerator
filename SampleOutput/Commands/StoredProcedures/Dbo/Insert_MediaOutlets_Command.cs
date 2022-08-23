@@ -10,10 +10,9 @@
 using Dapper;
 using System.Data;
 
-namespace SampleOutput.Commands.StoredProcedures.Dbo
+namespace SampleOutput.Commands.StoredProcedures.dbo
 {
-
-    public record struct Insert_MediaOutlets_Command(string? Name, string? Street, string? Street2, string? Street3, string? City, string? State, string? PostalCode, string? CountryRegion, int DeliveryScheduleId) : IDatabaseCommand
+    public record Insert_MediaOutlets_Command(string? Name, string? Street, string? Street2, string? Website, string? City, string? State, string? PostalCode, string? CountryRegion, string? Area, string? MaterialRequirements) : IDatabaseCommand
     {
         public DynamicParameters GetParameters()
         {
@@ -21,12 +20,13 @@ namespace SampleOutput.Commands.StoredProcedures.Dbo
             p.Add("Name", Name);
 			p.Add("Street", Street);
 			p.Add("Street2", Street2);
-			p.Add("Street3", Street3);
+			p.Add("Website", Website);
 			p.Add("City", City);
 			p.Add("State", State);
 			p.Add("PostalCode", PostalCode);
 			p.Add("CountryRegion", CountryRegion);
-			p.Add("DeliveryScheduleId", DeliveryScheduleId);
+			p.Add("Area", Area);
+			p.Add("MaterialRequirements", MaterialRequirements);
             return p;
         }
 
@@ -43,7 +43,7 @@ namespace SampleOutput.Commands.StoredProcedures.Dbo
 
         public override string ToString()
         {
-            return $"Name:{Name}, Street:{Street}, Street2:{Street2}, Street3:{Street3}, City:{City}, State:{State}, PostalCode:{PostalCode}, CountryRegion:{CountryRegion}, DeliveryScheduleId:{DeliveryScheduleId}";
+            return $"Name:{Name}, Street:{Street}, Street2:{Street2}, Website:{Website}, City:{City}, State:{State}, PostalCode:{PostalCode}, CountryRegion:{CountryRegion}, Area:{Area}, MaterialRequirements:{MaterialRequirements}";
         }
     }
 }

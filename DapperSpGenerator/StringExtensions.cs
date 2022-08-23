@@ -13,9 +13,26 @@ namespace DapperSpGenerator
             return !string.IsNullOrEmpty(val?.Trim());
         }
 
-        public static string ToUpperFirstCharacter(this string value)
+        public static string? ToUpperFirstCharacter(this string? str)
         {
-            return char.ToUpper(value[0]) + value[1..];
+            if (!string.IsNullOrEmpty(str) && char.IsUpper(str[0]))
+            {
+                return str.Length == 1 
+                    ? char.ToUpper(str[0]).ToString() 
+                    : char.ToUpper(str[0]) + str[1..];
+            }
+            return str;
+        }
+
+        public static string? ToLowerFirstCharacter(this string? str)
+        {
+            if (!string.IsNullOrEmpty(str) && char.IsUpper(str[0]))
+            {
+                return str.Length == 1 
+                    ? char.ToLower(str[0]).ToString() 
+                    : char.ToLower(str[0]) + str[1..];
+            }
+            return str;
         }
 
         public static string GetSqlType(this string? typeName)

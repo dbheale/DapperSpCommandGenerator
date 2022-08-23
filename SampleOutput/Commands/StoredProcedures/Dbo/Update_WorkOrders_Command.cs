@@ -10,10 +10,9 @@
 using Dapper;
 using System.Data;
 
-namespace SampleOutput.Commands.StoredProcedures.Dbo
+namespace SampleOutput.Commands.StoredProcedures.dbo
 {
-
-    public record struct Update_WorkOrders_Command(int Id, int WorkOrderTypeId, int WorkOrderStatusId, int ClientContactId, string? RefNumber, string? Notes, string? Lead, DateTime? CreatedDate, DateTime? ModifiedDate, DateTime? CompletedDate) : IDatabaseCommand
+    public record Update_WorkOrders_Command(int Id, int WorkOrderTypeId, int WorkOrderStatusId, int ClientContactId, int PublicationContactId, string? RefNumber, string? Notes, string? Lead, DateTime? CreatedDate, DateTime? ModifiedDate, DateTime? CompletedDate, int CampaignId, int MediaOutletId) : IDatabaseCommand
     {
         public DynamicParameters GetParameters()
         {
@@ -22,12 +21,15 @@ namespace SampleOutput.Commands.StoredProcedures.Dbo
 			p.Add("WorkOrderTypeId", WorkOrderTypeId);
 			p.Add("WorkOrderStatusId", WorkOrderStatusId);
 			p.Add("ClientContactId", ClientContactId);
+			p.Add("PublicationContactId", PublicationContactId);
 			p.Add("RefNumber", RefNumber);
 			p.Add("Notes", Notes);
 			p.Add("Lead", Lead);
 			p.Add("CreatedDate", CreatedDate);
 			p.Add("ModifiedDate", ModifiedDate);
 			p.Add("CompletedDate", CompletedDate);
+			p.Add("CampaignId", CampaignId);
+			p.Add("MediaOutletId", MediaOutletId);
             return p;
         }
 
@@ -44,7 +46,7 @@ namespace SampleOutput.Commands.StoredProcedures.Dbo
 
         public override string ToString()
         {
-            return $"Id:{Id}, WorkOrderTypeId:{WorkOrderTypeId}, WorkOrderStatusId:{WorkOrderStatusId}, ClientContactId:{ClientContactId}, RefNumber:{RefNumber}, Notes:{Notes}, Lead:{Lead}, CreatedDate:{CreatedDate}, ModifiedDate:{ModifiedDate}, CompletedDate:{CompletedDate}";
+            return $"Id:{Id}, WorkOrderTypeId:{WorkOrderTypeId}, WorkOrderStatusId:{WorkOrderStatusId}, ClientContactId:{ClientContactId}, PublicationContactId:{PublicationContactId}, RefNumber:{RefNumber}, Notes:{Notes}, Lead:{Lead}, CreatedDate:{CreatedDate}, ModifiedDate:{ModifiedDate}, CompletedDate:{CompletedDate}, CampaignId:{CampaignId}, MediaOutletId:{MediaOutletId}";
         }
     }
 }

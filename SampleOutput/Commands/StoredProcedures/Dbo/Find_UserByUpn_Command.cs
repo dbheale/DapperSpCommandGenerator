@@ -10,10 +10,9 @@
 using Dapper;
 using System.Data;
 
-namespace SampleOutput.Commands.StoredProcedures.Dbo
+namespace SampleOutput.Commands.StoredProcedures.dbo
 {
-
-    public record struct Find_UserByUpn_Command(string? Upn) : IDatabaseCommand
+    public record Find_UserByUpn_Command(string? Upn) : IDatabaseCommand
     {
         public DynamicParameters GetParameters()
         {

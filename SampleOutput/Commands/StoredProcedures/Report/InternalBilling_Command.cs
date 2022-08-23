@@ -12,14 +12,13 @@ using System.Data;
 
 namespace SampleOutput.Commands.StoredProcedures.Report
 {
-
-    public record struct InternalBilling_Command(DateTime? StartDate, DateTime? EndDate) : IDatabaseCommand
+    public record InternalBilling_Command(int UserId, int CampaignId) : IDatabaseCommand
     {
         public DynamicParameters GetParameters()
         {
             var p = new DynamicParameters();
-            p.Add("StartDate", StartDate);
-			p.Add("EndDate", EndDate);
+            p.Add("UserId", UserId);
+			p.Add("CampaignId", CampaignId);
             return p;
         }
 
@@ -36,7 +35,7 @@ namespace SampleOutput.Commands.StoredProcedures.Report
 
         public override string ToString()
         {
-            return $"StartDate:{StartDate}, EndDate:{EndDate}";
+            return $"UserId:{UserId}, CampaignId:{CampaignId}";
         }
     }
 }

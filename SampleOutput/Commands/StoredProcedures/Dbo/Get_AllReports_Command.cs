@@ -10,15 +10,14 @@
 using Dapper;
 using System.Data;
 
-namespace SampleOutput.Commands.StoredProcedures.Dbo
+namespace SampleOutput.Commands.StoredProcedures.dbo
 {
-
-    public record struct Get_AllReports_Command() : IDatabaseCommand
+    public record Get_AllReports_Command(int UserId) : IDatabaseCommand
     {
         public DynamicParameters GetParameters()
         {
             var p = new DynamicParameters();
-            
+            p.Add("UserId", UserId);
             return p;
         }
 
@@ -35,7 +34,7 @@ namespace SampleOutput.Commands.StoredProcedures.Dbo
 
         public override string ToString()
         {
-            return $"";
+            return $"UserId:{UserId}";
         }
     }
 }

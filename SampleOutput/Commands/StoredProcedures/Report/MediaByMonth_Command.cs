@@ -12,13 +12,14 @@ using System.Data;
 
 namespace SampleOutput.Commands.StoredProcedures.Report
 {
-
-    public record struct MediaByMonth_Command(DateTime? StartDate, DateTime? EndDate) : IDatabaseCommand
+    public record MediaByMonth_Command(int UserId, string? Company, DateTime? StartDate, DateTime? EndDate) : IDatabaseCommand
     {
         public DynamicParameters GetParameters()
         {
             var p = new DynamicParameters();
-            p.Add("StartDate", StartDate);
+            p.Add("UserId", UserId);
+			p.Add("Company", Company);
+			p.Add("StartDate", StartDate);
 			p.Add("EndDate", EndDate);
             return p;
         }
@@ -36,7 +37,7 @@ namespace SampleOutput.Commands.StoredProcedures.Report
 
         public override string ToString()
         {
-            return $"StartDate:{StartDate}, EndDate:{EndDate}";
+            return $"UserId:{UserId}, Company:{Company}, StartDate:{StartDate}, EndDate:{EndDate}";
         }
     }
 }

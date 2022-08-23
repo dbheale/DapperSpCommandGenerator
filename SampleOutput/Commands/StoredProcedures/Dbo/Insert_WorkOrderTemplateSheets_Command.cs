@@ -10,10 +10,9 @@
 using Dapper;
 using System.Data;
 
-namespace SampleOutput.Commands.StoredProcedures.Dbo
+namespace SampleOutput.Commands.StoredProcedures.dbo
 {
-
-    public record struct Insert_WorkOrderTemplateSheets_Command(string? SheetName, int RowIndex, string? ColumnName, int SortOrder) : IDatabaseCommand
+    public record Insert_WorkOrderTemplateSheets_Command(string? SheetName, int RowIndex, string? ColumnName, int SortOrder) : IDatabaseCommand
     {
         public DynamicParameters GetParameters()
         {

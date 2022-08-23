@@ -10,10 +10,9 @@
 using Dapper;
 using System.Data;
 
-namespace SampleOutput.Commands.StoredProcedures.Dbo
+namespace SampleOutput.Commands.StoredProcedures.dbo
 {
-
-    public record struct Get_AllClientOrderContacts_Command() : IDatabaseCommand
+    public record Get_AllClientOrderContacts_Command() : IDatabaseCommand
     {
         public DynamicParameters GetParameters()
         {

@@ -10,10 +10,9 @@
 using Dapper;
 using System.Data;
 
-namespace SampleOutput.Commands.StoredProcedures.Dbo
+namespace SampleOutput.Commands.StoredProcedures.dbo
 {
-
-    public record struct Insert_Users_Command(int ContactId, string? Upn, string? Sid) : IDatabaseCommand
+    public record Insert_Users_Command(int ContactId, string? Upn, string? Sid) : IDatabaseCommand
     {
         public DynamicParameters GetParameters()
         {
