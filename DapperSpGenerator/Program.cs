@@ -4,6 +4,9 @@ using Microsoft.Extensions.Configuration;
 
 IConfiguration config = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json")
+#if DEBUG
+    .AddJsonFile("appsettings.Development.json")
+#endif
     .AddCommandLine(args)
     .Build();
 
