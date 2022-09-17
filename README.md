@@ -25,12 +25,12 @@ Configuration; This can be configured in 3 different ways.
 
 Post code generation sample execution:
 
-`var users = await dbConn.QueryAsync<User>(new GetUser_Command(userId));`
+`IEnuerable<User> users = await dbConn.QueryAsync<User>(new GetUser_Command(userId));`
 
 If your stored procedure has OUT parameters, you can access them like so:
 
 ```
-var canDownloadCommand = new Assert_UserCanDownload_Command(userId, fileId);
+IDatabaseCommand canDownloadCommand = new Assert_UserCanDownload_Command(userId, fileId);
 await dbConn.ExecuteAsync(canDownloadCommand);  
-var canDownload = canDownloadCommand.CanDownload;
+bool canDownload = canDownloadCommand.CanDownload;
 ```
