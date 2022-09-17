@@ -25,7 +25,7 @@ Configuration; This can be configured in 3 different ways.
 
 Post code generation sample execution:
 
-`var user = await dbConn.QueryAsync<User>(new GetUser_Command(userId));`
+`var users = await dbConn.QueryAsync<User>(new GetUser_Command(userId));`
 
 If your stored procedure has OUT parameters, you can access them like so:
 
