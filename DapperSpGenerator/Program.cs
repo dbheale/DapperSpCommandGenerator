@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 
 IConfiguration config = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json")
+    .AddJsonFile("appsettings.local.json", true)
     .AddCommandLine(args)
     .Build();
 

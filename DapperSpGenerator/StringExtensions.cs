@@ -93,7 +93,7 @@ namespace DapperSpGenerator
                 "smallint" => "short?",
                 "int" => "int",
                 "bigint" => "long?",
-                "real" => "float?>",
+                "real" => "float?",
                 "float" => "double?",
                 "bit" => "bool?",
                 "decimal" or "numeric" or "money" or "smallmoney" => "decimal?",
