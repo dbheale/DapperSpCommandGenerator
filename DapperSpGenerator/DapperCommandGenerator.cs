@@ -86,7 +86,16 @@ namespace DapperSpGenerator
 
                 var parameters = GetDbParameters(storedProcedureGroup);
 
-                var commandClass = CreateCommandClass(desiredNamespace, schemaProper, spProper, parameters, schema, storedProcedure);
+                var commandClass = string.Empty;
+                
+                if(parameters.Any(a => a.IsOutput))
+                {
+                    commandClass = CreateCommandClass(desiredNamespace, schemaProper, spProper, parameters, schema, storedProcedure);
+                }
+                else
+                {
+                    commandClass = CreateCommandRecord(desiredNamespace, schemaProper, spProper, parameters, schema, storedProcedure);
+                }
 
                 var filepath = Path.Combine(schemaDirectory, $"{spProper}_Command.cs");
 
@@ -97,6 +106,51 @@ namespace DapperSpGenerator
 
                 File.WriteAllText(filepath, commandClass, Encoding.UTF8);
             }
+        }
+
+        private static string CreateCommandRecord(string desiredNamespace, string schemaProper, string spProper, List<DbParameter> parameters,
+                                                 string schema, string sp)
+        {
+            return $@"/*
+ *         _   _   _ _____ ___     ____ _____ _   _ _____ ____    _  _____ _____ ____  
+ *        / \ | | | |_   _/ _ \   / ___| ____| \ | | ____|  _ \  / \|_   _| ____|  _ \ 
+ *       / _ \| | | | | || | | | | |  _|  _| |  \| |  _| | |_) |/ _ \ | | |  _| | | | |
+ *      / ___ \ |_| | | || |_| | | |_| | |___| |\  | |___|  _ </ ___ \| | | |___| |_| |
+ *     /_/   \_\___/  |_| \___/   \____|_____|_| \_|_____|_| \_\/   \_\_| |_____|____/ 
+ *    This file has been automatically generated. Any modification will get overwritten.
+ *       If you want to create custom commands, they must be in a different folder.
+ */
+using Dapper;
+using System.Data;
+
+namespace {desiredNamespace}.Commands.StoredProcedures.{schemaProper}
+{{
+    public record {spProper}_Command({string.Join(", ", parameters.Select(s => s.Definition))}) : IDatabaseCommand
+    {{
+        public DynamicParameters GetParameters()
+        {{
+            var p = new DynamicParameters();
+            {string.Join($"{Environment.NewLine}\t\t\t", parameters.Select(s => s.SpParameter))}
+            return p;
+        }}
+
+        public CommandType GetCommandType() => CommandType.StoredProcedure;
+
+        public string GetSqlStatement() => ""[{schema}].[{sp}]"";
+
+        public bool HasOutParameters() => {(parameters.Any(a => a.IsOutput) ? "true" : "false")};
+
+        public void SetOutParameters(DynamicParameters parameters) 
+        {{
+            // Nothing to set
+        }}
+
+        public override string ToString()
+        {{
+            return $""{string.Join(", ", parameters.Select(s => s.String))}"";
+        }}
+    }}
+}}";
         }
 
         private static string CreateCommandClass(string desiredNamespace, string schemaProper, string spProper, List<DbParameter> parameters,
@@ -117,8 +171,16 @@ using System.Data;
 namespace {desiredNamespace}.Commands.StoredProcedures.{schemaProper}
 {{
 
-    public record struct {spProper}_Command({string.Join(", ", parameters.Select(s => s.Definition))}) : IDatabaseCommand
+    public class {spProper}_Command : IDatabaseCommand
     {{
+
+        public {spProper}_Command({string.Join(", ", parameters.Select(s => s.ConstructorDefinition))})
+        {{
+            {string.Join($"{Environment.NewLine}\t\t\t", parameters.Select(s => s.ConstructorSetValues))}
+        }}
+
+        {string.Join($"{Environment.NewLine}\t\t", parameters.Select(s => s.Properties))}
+
         {(parameters.Any() ? string.Empty : $"public static readonly {spProper}_Command Instance = new();{Environment.NewLine}")}
         public DynamicParameters GetParameters()
         {{
@@ -131,11 +193,11 @@ namespace {desiredNamespace}.Commands.StoredProcedures.{schemaProper}
 
         public string GetSqlStatement() => ""[{schema}].[{sp}]"";
 
-        public bool HasOutParameters() => {(parameters.Any(a => a.IsOutput) ? "true" : "false")};
+        public bool HasOutParameters() => true;
 
         public void SetOutParameters(DynamicParameters parameters) 
         {{
-            {(parameters.Any(a => a.IsOutput) ? string.Join($"{Environment.NewLine}\t\t\t", parameters.Select(s => s.SetPropertiesBack)) : "// Nothing to set")}
+            {string.Join($"{Environment.NewLine}\t\t\t", parameters.Where(w => w.IsOutput).Select(s => s.SetPropertiesBack))}
         }}
 
         public override string ToString()
@@ -145,6 +207,7 @@ namespace {desiredNamespace}.Commands.StoredProcedures.{schemaProper}
     }}
 }}";
         }
+
 
         private static List<DbParameter> GetDbParameters(IGrouping<string?, StoredProcedureDefinition> storedProcedureGroup)
         {

@@ -1,7 +1,7 @@
 ﻿# Dapper Stored Procedure Command Generator
 This project reads your database and creates "Commands" for Dapper to use. It reads all of your stored procedures in all of your schemas and creates a record for each for easier stored procedure execution.
 
-This currently is only tested for .Net 6 and uses Record Structs.
+This currently is only tested for .Net 6 and uses Records.
 
 Required information:
   1) Connection String (SQL)
@@ -25,12 +25,12 @@ Configuration; This can be configured in 3 different ways.
 
 Post code generation sample execution:
 
-`var user = await dbConn.QueryAsync<User>(new GetUser_Command(userId));`
+`IEnuerable<User> users = await dbConn.QueryAsync<User>(new GetUser_Command(userId));`
 
 If your stored procedure has OUT parameters, you can access them like so:
 
 ```
-var canDownloadCommand = new Assert_UserCanDownload_Command(userId, fileId);
+IDatabaseCommand canDownloadCommand = new Assert_UserCanDownload_Command(userId, fileId);
 await dbConn.ExecuteAsync(canDownloadCommand);  
-var canDownload = canDownloadCommand.CanDownload;
+bool canDownload = canDownloadCommand.CanDownload;
 ```
