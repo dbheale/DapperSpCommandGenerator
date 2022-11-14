@@ -1,5 +1,7 @@
 ﻿using Dapper;
+using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 
 namespace |^NAMESPACE^|
 {
@@ -8,7 +10,7 @@ namespace |^NAMESPACE^|
     /// </summary>
     public static partial class DapperCommandExtensions
     {
-        public static async Task<IEnumerable<T>> QueryAsync<T>(this IDbConnection dbConnection, IDatabaseCommand command, IDbTransaction? transaction = null, int? commandTimeout = null)
+        public static async Task<IEnumerable<T>> QueryAsync<T>(this IDbConnection dbConnection, IDatabaseCommand command, IDbTransaction transaction = null, int? commandTimeout = null)
         {
             var parameters = command.GetParameters();
 
@@ -27,7 +29,7 @@ namespace |^NAMESPACE^|
             return results;
         }
 
-        public static async Task<IEnumerable<dynamic>> QueryAsync(this IDbConnection dbConnection, IDatabaseCommand command, IDbTransaction? transaction = null, int? commandTimeout = null)
+        public static async Task<IEnumerable<dynamic>> QueryAsync(this IDbConnection dbConnection, IDatabaseCommand command, IDbTransaction transaction = null, int? commandTimeout = null)
         {
             var parameters = command.GetParameters();
 
@@ -46,7 +48,7 @@ namespace |^NAMESPACE^|
             return results;
         }
 
-        public static async Task<T> QueryFirstAsync<T>(this IDbConnection dbConnection, IDatabaseCommand command, IDbTransaction? transaction = null, int? commandTimeout = null)
+        public static async Task<T> QueryFirstAsync<T>(this IDbConnection dbConnection, IDatabaseCommand command, IDbTransaction transaction = null, int? commandTimeout = null)
         {
             var parameters = command.GetParameters();
 
@@ -65,7 +67,7 @@ namespace |^NAMESPACE^|
             return results;
         }
 
-        public static async Task<T> QueryFirstOrDefaultAsync<T>(this IDbConnection dbConnection, IDatabaseCommand command, IDbTransaction? transaction = null, int? commandTimeout = null)
+        public static async Task<T> QueryFirstOrDefaultAsync<T>(this IDbConnection dbConnection, IDatabaseCommand command, IDbTransaction transaction = null, int? commandTimeout = null)
         {
             var parameters = command.GetParameters();
 
@@ -84,7 +86,7 @@ namespace |^NAMESPACE^|
             return results;
         }
 
-        public static async Task<T> QuerySingleAsync<T>(this IDbConnection dbConnection, IDatabaseCommand command, IDbTransaction? transaction = null, int? commandTimeout = null)
+        public static async Task<T> QuerySingleAsync<T>(this IDbConnection dbConnection, IDatabaseCommand command, IDbTransaction transaction = null, int? commandTimeout = null)
         {
             var parameters = command.GetParameters();
 
@@ -103,7 +105,7 @@ namespace |^NAMESPACE^|
             return results;
         }
 
-        public static async Task<T> QuerySingleOrDefaultAsync<T>(this IDbConnection dbConnection, IDatabaseCommand command, IDbTransaction? transaction = null, int? commandTimeout = null)
+        public static async Task<T> QuerySingleOrDefaultAsync<T>(this IDbConnection dbConnection, IDatabaseCommand command, IDbTransaction transaction = null, int? commandTimeout = null)
         {
             var parameters = command.GetParameters();
 
@@ -122,7 +124,7 @@ namespace |^NAMESPACE^|
             return results;
         }
 
-        public static async Task<int> ExecuteAsync(this IDbConnection dbConnection, IDatabaseCommand command, IDbTransaction? transaction = null, int? commandTimeout = null)
+        public static async Task<int> ExecuteAsync(this IDbConnection dbConnection, IDatabaseCommand command, IDbTransaction transaction = null, int? commandTimeout = null)
         {
             var parameters = command.GetParameters();
 
@@ -141,7 +143,7 @@ namespace |^NAMESPACE^|
             return results;
         }
 
-        public static async Task<T> ExecuteScalarAsync<T>(this IDbConnection dbConnection, IDatabaseCommand command, IDbTransaction? transaction = null, int? commandTimeout = null)
+        public static async Task<T> ExecuteScalarAsync<T>(this IDbConnection dbConnection, IDatabaseCommand command, IDbTransaction transaction = null, int? commandTimeout = null)
         {
             var parameters = command.GetParameters();
 

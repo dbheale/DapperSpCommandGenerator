@@ -2,13 +2,13 @@
 using System.Data.SqlClient;
 using System.Text;
 using Dapper;
-using DapperSpGenerator.Properties;
 
 namespace DapperSpGenerator
 {
     public class DapperCommandGeneration
     {
-        public static async Task GenerateDapperClasses(string connectionString, string rootPath, string desiredNamespace)
+        public static async Task GenerateDapperClasses(string connectionString, string rootPath,
+                                                       string desiredNamespace, bool enableForDotNetStandard2)
         {
             using IDbConnection connection = new SqlConnection(connectionString);
 
@@ -32,7 +32,7 @@ namespace DapperSpGenerator
 
             foreach (var schemaRecords in schemaRecordsGroup)
             {
-                BuildFiles(schemaRecords!, rootPath, desiredNamespace);
+                BuildFiles(schemaRecords!, rootPath, desiredNamespace, enableForDotNetStandard2);
             }
         }
 
@@ -44,7 +44,7 @@ namespace DapperSpGenerator
                 File.Delete(contract);
             }
 
-            await File.WriteAllTextAsync(contract, Resources.IDatabaseCommand.Replace("|^NAMESPACE^|", desiredNamespace));
+            await File.WriteAllTextAsync(contract, StaticStrings.IDatabaseCommand.Replace("|^NAMESPACE^|", desiredNamespace));
         }
 
         private static async Task ReWriteDapperExtensions(string rootPath, string desiredNamespace)
@@ -56,11 +56,11 @@ namespace DapperSpGenerator
             }
 
             await File.WriteAllTextAsync(
-                extensions, Resources.DapperCommandExtensions.Replace("|^NAMESPACE^|", desiredNamespace)
+                extensions, StaticStrings.DapperCommandExtensions.Replace("|^NAMESPACE^|", desiredNamespace)
             );
         }
 
-        private static void BuildFiles(IGrouping<string, StoredProcedureDefinition> schemaRecords, string rootPath, string desiredNamespace)
+        private static void BuildFiles(IGrouping<string, StoredProcedureDefinition> schemaRecords, string rootPath, string desiredNamespace, bool enableForDotNetStandard2)
         {
             var schema = schemaRecords.Key;
 
@@ -84,11 +84,11 @@ namespace DapperSpGenerator
 
                 var spProper = storedProcedure.ToUpperFirstCharacter();
 
-                var parameters = GetDbParameters(storedProcedureGroup);
+                var parameters = GetDbParameters(storedProcedureGroup, !enableForDotNetStandard2);
 
                 var commandClass = string.Empty;
                 
-                if(parameters.Any(a => a.IsOutput))
+                if(parameters.Any(a => a.IsOutput) || enableForDotNetStandard2)
                 {
                     commandClass = CreateCommandClass(desiredNamespace, schemaProper, spProper, parameters, schema, storedProcedure);
                 }
@@ -120,6 +120,7 @@ namespace DapperSpGenerator
  *    This file has been automatically generated. Any modification will get overwritten.
  *       If you want to create custom commands, they must be in a different folder.
  */
+using System;
 using Dapper;
 using System.Data;
 
@@ -166,6 +167,7 @@ namespace {desiredNamespace}.Commands.StoredProcedures.{schemaProper}
  *    This file has been automatically generated. Any modification will get overwritten.
  *       If you want to create custom commands, they must be in a different folder.
  */
+using System;
 using Dapper;
 using System.Data;
 
@@ -209,7 +211,7 @@ namespace {desiredNamespace}.Commands.StoredProcedures.{schemaProper}
         }
 
 
-        private static List<DbParameter> GetDbParameters(IGrouping<string?, StoredProcedureDefinition> storedProcedureGroup)
+        private static List<DbParameter> GetDbParameters(IGrouping<string?, StoredProcedureDefinition> storedProcedureGroup, bool nullability)
         {
             var hasParameters = storedProcedureGroup.All(a => a.ParameterName.HasContent());
 
@@ -222,7 +224,7 @@ namespace {desiredNamespace}.Commands.StoredProcedures.{schemaProper}
                         s => new
                         {
                             Parameter = s.ParameterName?.Trim().TrimStart('@'),
-                            ParameterType = s.Type?.Trim().GetCSharpType(),
+                            ParameterType = s.Type?.Trim().GetCSharpType(nullability),
                             SqlType = s.Type?.Trim().GetSqlType(),
                             DbType = s.Type?.Trim().GetDbType(),
                             IsOutput = s.IsOutput ?? false,

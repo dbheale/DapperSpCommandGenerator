@@ -23,9 +23,9 @@ public class DbParameter
     public int ParameterIndex { get; }
     public string Size { get; }
 
-    public string Definition => $"{ParameterType} {ParameterProper}";
-    public string ConstructorDefinition => $"{ParameterType} {ParameterProper.ToLowerFirstCharacter()}";
-    public string ConstructorSetValues => $"this.{ParameterProper} = {ParameterProper.ToLowerFirstCharacter()};";
+    public string Definition => $"{ParameterType} @{ParameterProper}";
+    public string ConstructorDefinition => $"{ParameterType} @{ParameterProper.ToLowerFirstCharacter()}";
+    public string ConstructorSetValues => $"this.{ParameterProper} = @{ParameterProper.ToLowerFirstCharacter()};";
     public string String => $"{ParameterProper}:{{{ParameterProper}}}";
     public string SetPropertiesBack => IsOutput ? $"{ParameterProper} = parameters.Get<{ParameterType}>(\"{Parameter}\");" : string.Empty;
     public string Properties => $"public {ParameterType} {ParameterProper} {{ get; {(IsOutput ? "internal set; " : string.Empty)}}}";

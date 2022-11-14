@@ -17,8 +17,8 @@ namespace DapperSpGenerator
         {
             if (!string.IsNullOrEmpty(str) && char.IsUpper(str[0]))
             {
-                return str.Length == 1 
-                    ? char.ToUpper(str[0]).ToString() 
+                return str.Length == 1
+                    ? char.ToUpper(str[0]).ToString()
                     : char.ToUpper(str[0]) + str[1..];
             }
             return str;
@@ -28,8 +28,8 @@ namespace DapperSpGenerator
         {
             if (!string.IsNullOrEmpty(str) && char.IsUpper(str[0]))
             {
-                return str.Length == 1 
-                    ? char.ToLower(str[0]).ToString() 
+                return str.Length == 1
+                    ? char.ToLower(str[0]).ToString()
                     : char.ToLower(str[0]) + str[1..];
             }
             return str;
@@ -99,7 +99,7 @@ namespace DapperSpGenerator
             };
         }
 
-        public static string GetCSharpType(this string? typeName)
+        public static string GetCSharpType(this string? typeName, bool nullability = true)
         {
             return typeName switch
             {
@@ -108,16 +108,44 @@ namespace DapperSpGenerator
                 "datetimeoffset" => "DateTimeOffset?",
                 "tinyint" => "byte?",
                 "smallint" => "short?",
-                "int" => "int",
+                "int" => "int?",
                 "bigint" => "long?",
                 "real" => "float?",
                 "float" => "double?",
                 "bit" => "bool?",
                 "decimal" or "numeric" or "money" or "smallmoney" => "decimal?",
-                "image" or "binary" or "varbinary" or "timestamp" => "byte[]?",
-                "text" or "ntext" or "char" or "nchar" or "varchar" or "nvarchar" => "string?",
-                _ => "object?",
+                "image" or "binary" or "varbinary" or "timestamp" => nullability ? "byte[]?" : "byte[]",
+                "text" or "ntext" or "char" or "nchar" or "varchar" or "nvarchar" => nullability ? "string?" : "string",
+                _ => nullability ? "object?" : "object",
             };
+        }
+
+        /// <summary>
+        /// If conversion fails, the default value is returned.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
+        public static bool? ToBool(this string? source)
+        {
+            if (string.IsNullOrEmpty(source))
+            {
+                return default;
+            }
+
+            switch (source)
+            {
+                case "1":
+                case { } a when a.StartsWith("t", StringComparison.OrdinalIgnoreCase): // true/t/etc.
+                case { } b when b.StartsWith("y", StringComparison.OrdinalIgnoreCase): // yes/y/etc.
+                    return true;
+                case "0":
+                case { } a when a.StartsWith("f", StringComparison.OrdinalIgnoreCase): // false/f/fal/etc.
+                case { } b when b.StartsWith("n", StringComparison.OrdinalIgnoreCase): // no/n/niet/etc.
+                    return false;
+            }
+
+            return default;
         }
     }
 }
