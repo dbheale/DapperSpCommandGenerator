@@ -17,7 +17,8 @@ Configuration; This can be configured in 3 different ways.
         "Main": ""
       },
       "TargetPath": "",
-      "Namespace": "" 
+      "Namespace": "",
+      "EnableForDotNetStandard2": ""
     }
 ```
   3) Durring execution you will be prompted if any of these values are not provided or are empty.
