@@ -149,7 +149,7 @@ namespace {desiredNamespace}.Commands.StoredProcedures.{schemaProper}
 
         public override string ToString()
         {{
-            return $""{string.Join(", ", parameters.Select(s => s.String))}"";
+            return $""EXEC {{GetSqlStatement()}} {string.Join(", ", parameters.Select(s => s.ParamString))};"";
         }}
     }}
 }}";
@@ -204,7 +204,7 @@ namespace {desiredNamespace}.Commands.StoredProcedures.{schemaProper}
 
         public override string ToString()
         {{
-            return $""{string.Join(", ", parameters.Select(s => s.String))}"";
+            return $""EXEC {{GetSqlStatement()}} {string.Join(", ", parameters.Select(s => s.ParamString))};"";
         }}
     }}
 }}";
