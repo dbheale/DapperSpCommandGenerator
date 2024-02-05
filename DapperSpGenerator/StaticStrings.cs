@@ -51,9 +51,10 @@ namespace |^NAMESPACE^|
     }
 }";
 
-        // Query to get all stored procedures in every schema.
+        
         public static string DapperCommandExtensions = @"
 using Dapper;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
@@ -216,6 +217,53 @@ namespace |^NAMESPACE^|
 
             return results;
         }
+
+        public static string FormatForSql<T>(this T value) where T : class
+        {
+            switch (value)
+            {
+                case null:
+                    return ""NULL"";
+                case string s:
+                    return $""'{s.Replace(""'"", ""''"")}'""; // Handle single quotes in strings
+                case char c:
+                    return $""'{c.ToString().Replace(""'"", ""''"")}'"";
+                case DateTime dt:
+                    return $""'{dt:yyyy-MM-ddTHH:mm:ss}'"";
+                case DateTimeOffset dto:
+                    return $""'{dto:yyyy-MM-ddTHH:mm:ss}'"";
+                case bool b:
+                    // Convert boolean to 1 or 0; direct cast is safe
+                    return b ? ""1"" : ""0"";
+                default:
+                    return value.ToString(); // Fallback for other reference types
+            }
+        }
+
+        public static string FormatForSql<T>(this T? value) where T : struct
+        {
+            switch (value)
+            {
+                case null:
+                    return ""NULL"";
+                case char c:
+                    return $""'{c.ToString().Replace(""'"", ""''"")}'""; // Handle single quotes in strings
+                case DateTime dt:
+                    return $""'{dt:yyyy-MM-ddTHH:mm:ss}'"";
+                case DateTimeOffset dto:
+                    return $""'{dto:yyyy-MM-ddTHH:mm:ss}'"";
+                case bool b:
+                    return b ? ""1"" : ""0"";
+            }
+
+            if (typeof(T).IsEnum)
+            {
+                return $""'{value.ToString()}'"";
+            }
+
+            return value.ToString(); // Fallback for other value types
+        }
+
     }
 }";
     }

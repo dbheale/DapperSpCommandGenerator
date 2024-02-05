@@ -119,6 +119,24 @@ namespace DapperSpGenerator
                 _ => nullability ? "object?" : "object",
             };
         }
+        
+        public static string FormatValueForSql(this string value, string csharpTypeName)
+        {
+            switch (csharpTypeName)
+            {
+                case "string":
+                case "string?":
+                case "DateTime?":
+                case "DateTimeOffset?":
+                case "TimeSpan?":
+                case "bool":
+                case "bool?":
+                    return $"{{{value}.FormatForSql()}}"; // escape anything needed for SQL text
+                default:
+                    // Fallback for types not explicitly handled
+                    return $"{{{value}}}";
+            }
+        }
 
         /// <summary>
         /// If conversion fails, the default value is returned.
