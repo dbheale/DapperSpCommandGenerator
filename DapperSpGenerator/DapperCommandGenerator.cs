@@ -126,7 +126,7 @@ using System.Data;
 
 namespace {desiredNamespace}.Commands.StoredProcedures.{schemaProper}
 {{
-    public record {spProper}_Command({string.Join(", ", parameters.Select(s => s.Definition))}) : IDatabaseCommand
+    public partial record {spProper}_Command({string.Join(", ", parameters.Select(s => s.Definition))}) : IDatabaseCommand
     {{
         {(parameters.Any() ? string.Empty : $"public static readonly {spProper}_Command Instance = new {spProper}_Command();{Environment.NewLine}")}
         public DynamicParameters GetParameters()
@@ -174,7 +174,7 @@ using System.Data;
 namespace {desiredNamespace}.Commands.StoredProcedures.{schemaProper}
 {{
 
-    public class {spProper}_Command : IDatabaseCommand
+    public partial class {spProper}_Command : IDatabaseCommand
     {{
         {(parameters.Any() ? string.Empty : $"public static readonly {spProper}_Command Instance = new {spProper}_Command();{Environment.NewLine}")}
         {string.Join($"{Environment.NewLine}\t\t", parameters.Select(s => s.Properties))}
