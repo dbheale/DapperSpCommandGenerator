@@ -67,7 +67,7 @@ namespace SampleOutput
             return results;
         }
 
-        public static async Task<T> QueryFirstOrDefaultAsync<T>(this IDbConnection dbConnection, IDatabaseCommand command, IDbTransaction? transaction = null, int? commandTimeout = null)
+        public static async Task<T?> QueryFirstOrDefaultAsync<T>(this IDbConnection dbConnection, IDatabaseCommand command, IDbTransaction? transaction = null, int? commandTimeout = null)
         {
             var parameters = command.GetParameters();
 
@@ -105,7 +105,7 @@ namespace SampleOutput
             return results;
         }
 
-        public static async Task<T> QuerySingleOrDefaultAsync<T>(this IDbConnection dbConnection, IDatabaseCommand command, IDbTransaction? transaction = null, int? commandTimeout = null)
+        public static async Task<T?> QuerySingleOrDefaultAsync<T>(this IDbConnection dbConnection, IDatabaseCommand command, IDbTransaction? transaction = null, int? commandTimeout = null)
         {
             var parameters = command.GetParameters();
 
@@ -143,7 +143,7 @@ namespace SampleOutput
             return results;
         }
 
-        public static async Task<T> ExecuteScalarAsync<T>(this IDbConnection dbConnection, IDatabaseCommand command, IDbTransaction? transaction = null, int? commandTimeout = null)
+        public static async Task<T?> ExecuteScalarAsync<T>(this IDbConnection dbConnection, IDatabaseCommand command, IDbTransaction? transaction = null, int? commandTimeout = null)
         {
             var parameters = command.GetParameters();
 

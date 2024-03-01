@@ -66,6 +66,8 @@ namespace DapperSpGenerator
 
             var schemaProper = schema.ToUpperFirstCharacter();
 
+            if (schemaProper == null) throw new ArgumentException("Stored procedures are missing a schema.");
+
             var schemaDirectory = Path.Combine(rootPath, StaticStrings.StoredProcedureRelativeFolderPath, $"{schemaProper}");
 
             Directory.CreateDirectory(schemaDirectory);
@@ -83,10 +85,12 @@ namespace DapperSpGenerator
                 }
 
                 var spProper = storedProcedure.ToUpperFirstCharacter();
+                
+                if (spProper == null) throw new ArgumentException("Stored procedure is missing a name.");
 
                 var parameters = GetDbParameters(storedProcedureGroup, !enableForDotNetStandard2);
 
-                var commandClass = string.Empty;
+                string commandClass;
                 
                 if(parameters.Any(a => a.IsOutput) || enableForDotNetStandard2)
                 {
@@ -235,7 +239,7 @@ namespace {desiredNamespace}.Commands.StoredProcedures.{schemaProper}
                     .Where(w => w.Parameter.HasContent())
                     .Select(
                         s => new DbParameter(
-                            s.Parameter!, s.Parameter!.ToUpperFirstCharacter(), s.ParameterType!,
+                            s.Parameter!, s.Parameter!.ToUpperFirstCharacter()!, s.ParameterType!,
                             s.SqlType!, s.DbType!, s.IsOutput, s.ParameterIndex, s.Size!
                         )
                     ).ToList();
