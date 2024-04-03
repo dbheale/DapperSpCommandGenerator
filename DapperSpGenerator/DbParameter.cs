@@ -30,5 +30,5 @@ public class DbParameter
     public string ParamString => $"@{ParameterProper} = {ParameterProper.FormatValueForSql(ParameterType)}";
     public string SetPropertiesBack => IsOutput ? $"{ParameterProper} = parameters.Get<{ParameterType}>(\"{Parameter}\");" : string.Empty;
     public string Properties => $"public {ParameterType} {ParameterProper} {{ get; {(IsOutput ? "internal set; " : string.Empty)}}}";
-    public string SpParameter => $@"p.Add(""{Parameter}"", {ParameterProper}{(IsOutput ? $", direction: ParameterDirection.Output, size: {Size}, dbType: {DbType}" : string.Empty)});";
+    public string SpParameter => $@"p.Add(""{Parameter}"", {ParameterProper}, dbType: {DbType}{(IsOutput ? ", direction: ParameterDirection.Output" : string.Empty)}, size: {Size});";
 }
