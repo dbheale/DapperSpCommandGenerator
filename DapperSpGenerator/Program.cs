@@ -2,6 +2,8 @@
 using DapperSpGenerator;
 using Microsoft.Extensions.Configuration;
 
+Console.WriteLine("Beginning to generate commands");
+
 IConfiguration config = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json")
     .AddJsonFile("appsettings.local.json", true)
@@ -11,7 +13,13 @@ IConfiguration config = new ConfigurationBuilder()
 var connectionString = config.GetConnectionString("Main");
 var targetPath = config["TargetPath"];
 var desiredNamespace = config["Namespace"];
-var enableForDotNetStandard2 = config["EnableForDotNetStandard2"].ToBool();
+var enableForDotNetStandard2 = config["EnableForDotNetStandard2"].ToNullableBool();
+
+
+var interfaceNamespace = config["InterfaceNamespace"];
+var ignoredSchemas = config["IgnoredSchemas"]?.Split("|", StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>();
+var generateExtensions = config["GenerateExtensions"].ToBool(true);
+var generateInterfaces = config["GenerateInterfaces"].ToBool(true);
 
 if (!connectionString.HasContent())
 {
@@ -41,9 +49,16 @@ Argue.HasContent(connectionString);
 Argue.HasContent(targetPath);
 Argue.HasContent(desiredNamespace);
 
+Console.WriteLine("IgnoredSchemas: {0}", string.Join(", ", ignoredSchemas));
+Console.WriteLine("InterfaceNamespace: {0}", interfaceNamespace);
+Console.WriteLine("GenerateExtensions: {0}", generateExtensions);
+Console.WriteLine("GenerateInterfaces: {0}", generateInterfaces);
+
 var sw = new Stopwatch();
 sw.Start();
-await DapperCommandGeneration.GenerateDapperClasses(connectionString!, targetPath!, desiredNamespace!, enableForDotNetStandard2.Value);
+await DapperCommandGeneration.GenerateDapperClasses(connectionString!, targetPath!, 
+    desiredNamespace!, enableForDotNetStandard2.Value, interfaceNamespace,
+    generateExtensions, generateInterfaces, ignoredSchemas);
 sw.Stop();
 
 Console.WriteLine(StaticStrings.FinishMessage, sw.ElapsedMilliseconds);

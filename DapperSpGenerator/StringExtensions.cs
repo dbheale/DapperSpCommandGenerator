@@ -144,11 +144,11 @@ namespace DapperSpGenerator
         /// <param name="source"></param>
         /// <param name="defaultValue"></param>
         /// <returns></returns>
-        public static bool? ToBool(this string? source)
+        public static bool? ToNullableBool(this string? source, bool? defaultValue = default)
         {
             if (string.IsNullOrEmpty(source))
             {
-                return default;
+                return defaultValue;
             }
 
             switch (source)
@@ -163,7 +163,35 @@ namespace DapperSpGenerator
                     return false;
             }
 
-            return default;
+            return defaultValue;
+        }
+
+        /// <summary>
+        /// If conversion fails, the default value is returned.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
+        public static bool ToBool(this string? source, bool defaultValue = default)
+        {
+            if (string.IsNullOrEmpty(source))
+            {
+                return defaultValue;
+            }
+
+            switch (source)
+            {
+                case "1":
+                case { } a when a.StartsWith("t", StringComparison.OrdinalIgnoreCase): // true/t/etc.
+                case { } b when b.StartsWith("y", StringComparison.OrdinalIgnoreCase): // yes/y/etc.
+                    return true;
+                case "0":
+                case { } a when a.StartsWith("f", StringComparison.OrdinalIgnoreCase): // false/f/fal/etc.
+                case { } b when b.StartsWith("n", StringComparison.OrdinalIgnoreCase): // no/n/niet/etc.
+                    return false;
+            }
+
+            return defaultValue;
         }
     }
 }

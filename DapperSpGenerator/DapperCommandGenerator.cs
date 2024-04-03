@@ -8,13 +8,19 @@ namespace DapperSpGenerator
     public class DapperCommandGeneration
     {
         public static async Task GenerateDapperClasses(string connectionString, string rootPath,
-                                                       string desiredNamespace, bool enableForDotNetStandard2)
+            string desiredNamespace, bool enableForDotNetStandard2, string? interfaceNamespace,
+            bool generateExtensions, bool generateInterfaces, string[] ignoredSchemas)
         {
             using IDbConnection connection = new SqlConnection(connectionString);
 
-            await ReWriteDapperExtensions(rootPath, desiredNamespace);
-
-            await ReWriteCommandInterface(rootPath, desiredNamespace);
+            if(generateExtensions)
+            {
+                await ReWriteDapperExtensions(rootPath, desiredNamespace);
+            }
+            if (generateInterfaces)
+            {
+                await ReWriteCommandInterface(rootPath, desiredNamespace);
+            }
 
             var spDir = Path.Combine(rootPath, StaticStrings.StoredProcedureRelativeFolderPath);
 
@@ -23,16 +29,17 @@ namespace DapperSpGenerator
                 Directory.Delete(spDir, true);
             }
 
-            var storedProcedureDefinitions = await connection.QueryAsync<StoredProcedureDefinition>(StaticStrings.Query);
+            var storedProcedureDefinitions =
+                await connection.QueryAsync<StoredProcedureDefinition>(StaticStrings.Query);
 
             // Group by schema, ignore the `temp` schema.
             var schemaRecordsGroup = storedProcedureDefinitions
-                                     .GroupBy(g => g.Schema)
-                                     .Where(w => !"temp".Equals(w.Key, StringComparison.OrdinalIgnoreCase));
+                .GroupBy(g => g.Schema)
+                .Where(w => !ignoredSchemas.Contains(w.Key, StringComparer.OrdinalIgnoreCase));
 
             foreach (var schemaRecords in schemaRecordsGroup)
             {
-                BuildFiles(schemaRecords!, rootPath, desiredNamespace, enableForDotNetStandard2);
+                BuildFiles(schemaRecords!, rootPath, desiredNamespace, enableForDotNetStandard2, interfaceNamespace);
             }
         }
 
@@ -44,7 +51,8 @@ namespace DapperSpGenerator
                 File.Delete(contract);
             }
 
-            await File.WriteAllTextAsync(contract, StaticStrings.IDatabaseCommand.Replace("|^NAMESPACE^|", desiredNamespace));
+            await File.WriteAllTextAsync(contract,
+                StaticStrings.IDatabaseCommand.Replace("|^NAMESPACE^|", desiredNamespace));
         }
 
         private static async Task ReWriteDapperExtensions(string rootPath, string desiredNamespace)
@@ -60,7 +68,8 @@ namespace DapperSpGenerator
             );
         }
 
-        private static void BuildFiles(IGrouping<string, StoredProcedureDefinition> schemaRecords, string rootPath, string desiredNamespace, bool enableForDotNetStandard2)
+        private static void BuildFiles(IGrouping<string, StoredProcedureDefinition> schemaRecords, string rootPath,
+            string desiredNamespace, bool enableForDotNetStandard2, string? interfaceNamespace)
         {
             var schema = schemaRecords.Key;
 
@@ -68,7 +77,8 @@ namespace DapperSpGenerator
 
             if (schemaProper == null) throw new ArgumentException("Stored procedures are missing a schema.");
 
-            var schemaDirectory = Path.Combine(rootPath, StaticStrings.StoredProcedureRelativeFolderPath, $"{schemaProper}");
+            var schemaDirectory =
+                Path.Combine(rootPath, StaticStrings.StoredProcedureRelativeFolderPath, $"{schemaProper}");
 
             Directory.CreateDirectory(schemaDirectory);
 
@@ -85,20 +95,22 @@ namespace DapperSpGenerator
                 }
 
                 var spProper = storedProcedure.ToUpperFirstCharacter();
-                
+
                 if (spProper == null) throw new ArgumentException("Stored procedure is missing a name.");
 
                 var parameters = GetDbParameters(storedProcedureGroup, !enableForDotNetStandard2);
 
                 string commandClass;
-                
-                if(parameters.Any(a => a.IsOutput) || enableForDotNetStandard2)
+
+                if (parameters.Any(a => a.IsOutput) || enableForDotNetStandard2)
                 {
-                    commandClass = CreateCommandClass(desiredNamespace, schemaProper, spProper, parameters, schema, storedProcedure);
+                    commandClass = CreateCommandClass(desiredNamespace, schemaProper, spProper, parameters, schema,
+                        storedProcedure, interfaceNamespace);
                 }
                 else
                 {
-                    commandClass = CreateCommandRecord(desiredNamespace, schemaProper, spProper, parameters, schema, storedProcedure);
+                    commandClass = CreateCommandRecord(desiredNamespace, schemaProper, spProper, parameters, schema,
+                        storedProcedure, interfaceNamespace);
                 }
 
                 var filepath = Path.Combine(schemaDirectory, $"{spProper}_Command.cs");
@@ -112,9 +124,15 @@ namespace DapperSpGenerator
             }
         }
 
-        private static string CreateCommandRecord(string desiredNamespace, string schemaProper, string spProper, List<DbParameter> parameters,
-                                                 string schema, string sp)
+        private static string CreateCommandRecord(string desiredNamespace, string schemaProper, string spProper,
+            List<DbParameter> parameters,
+            string schema, string sp, string? interfaceNamespace)
         {
+            var extendedUsing = string.Empty;
+            if (interfaceNamespace.HasContent())
+            {
+                extendedUsing += $"{Environment.NewLine}using {interfaceNamespace};";
+            }
             return $@"/*
  *         _   _   _ _____ ___     ____ _____ _   _ _____ ____    _  _____ _____ ____  
  *        / \ | | | |_   _/ _ \   / ___| ____| \ | | ____|  _ \  / \|_   _| ____|  _ \ 
@@ -126,9 +144,9 @@ namespace DapperSpGenerator
  */
 using System;
 using Dapper;
-using System.Data;
+using System.Data;{extendedUsing}
 
-namespace {desiredNamespace}.Commands.StoredProcedures.{schemaProper}
+namespace {desiredNamespace}.Commands.{schemaProper}
 {{
     public partial record {spProper}_Command({string.Join(", ", parameters.Select(s => s.Definition))}) : IDatabaseCommand
     {{
@@ -159,9 +177,16 @@ namespace {desiredNamespace}.Commands.StoredProcedures.{schemaProper}
 }}";
         }
 
-        private static string CreateCommandClass(string desiredNamespace, string schemaProper, string spProper, List<DbParameter> parameters,
-                                                 string schema, string sp)
+        private static string CreateCommandClass(string desiredNamespace, string schemaProper, string spProper,
+            List<DbParameter> parameters,
+            string schema, string sp, string? interfaceNamespace = default)
         {
+            var extendedUsing = string.Empty;
+            if (interfaceNamespace.HasContent())
+            {
+                extendedUsing += $"{Environment.NewLine}using {interfaceNamespace};";
+            }
+
             return $@"/*
  *         _   _   _ _____ ___     ____ _____ _   _ _____ ____    _  _____ _____ ____  
  *        / \ | | | |_   _/ _ \   / ___| ____| \ | | ____|  _ \  / \|_   _| ____|  _ \ 
@@ -173,9 +198,9 @@ namespace {desiredNamespace}.Commands.StoredProcedures.{schemaProper}
  */
 using System;
 using Dapper;
-using System.Data;
+using System.Data;{extendedUsing}
 
-namespace {desiredNamespace}.Commands.StoredProcedures.{schemaProper}
+namespace {desiredNamespace}.Commands.{schemaProper}
 {{
 
     public partial class {spProper}_Command : IDatabaseCommand
@@ -215,7 +240,8 @@ namespace {desiredNamespace}.Commands.StoredProcedures.{schemaProper}
         }
 
 
-        private static List<DbParameter> GetDbParameters(IGrouping<string?, StoredProcedureDefinition> storedProcedureGroup, bool nullability)
+        private static List<DbParameter> GetDbParameters(
+            IGrouping<string?, StoredProcedureDefinition> storedProcedureGroup, bool nullability)
         {
             var hasParameters = storedProcedureGroup.All(a => a.ParameterName.HasContent());
 
@@ -247,6 +273,5 @@ namespace {desiredNamespace}.Commands.StoredProcedures.{schemaProper}
 
             return parameters;
         }
-
     }
 }

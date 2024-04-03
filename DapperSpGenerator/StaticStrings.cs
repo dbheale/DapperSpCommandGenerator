@@ -9,7 +9,7 @@
         public static string DotNetStandardMessage = "Backwards compatibility for .NET Standard 2.0? ";
         public static string FinishMessage = "Commands generated in {0}ms.";
 
-		public static string StoredProcedureRelativeFolderPath = "Commands/StoredProcedures";
+		public static string StoredProcedureRelativeFolderPath = "Commands";
 
 		// Query to get all stored procedures in every schema.
 		public static string Query = @"
