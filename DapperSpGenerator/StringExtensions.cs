@@ -122,20 +122,12 @@ namespace DapperSpGenerator
         
         public static string FormatValueForSql(this string value, string csharpTypeName)
         {
-            switch (csharpTypeName)
+            return csharpTypeName switch
             {
-                case "string":
-                case "string?":
-                case "DateTime?":
-                case "DateTimeOffset?":
-                case "TimeSpan?":
-                case "bool":
-                case "bool?":
-                    return $"{{{value}.FormatForSql()}}"; // escape anything needed for SQL text
-                default:
-                    // Fallback for types not explicitly handled
-                    return $"{{{value}}}";
-            }
+                "string" or "bool" => $"{{{value}.FormatForSql()}}", // anything needed for SQL text
+                var type when type.EndsWith('?') => $"{{{value}.FormatForSql()}}", // anything that can be null
+                _ => $"{{{value}}}" // default
+            };
         }
 
         /// <summary>
